@@ -1,6 +1,6 @@
 {
    "name": "@imgdrop/pnm",
-   "version": "1.0.1",
+   "version": "1.0.2",
    "license": "MIT",
    "main": "./bin",
    "files": [
@@ -21,7 +21,7 @@
       "build": "tsc",
       "lint": "run-s lint:*",
       "lint:eslint": "eslint \"**/*.ts\" --max-warnings 0",
-      "lint:prettier": "prettier \"**/*.{ts,js,json,yml}\" -c",
+      "lint:prettier": "prettier \"**/*.{ts,js,json,yml,md}\" -c",
       "fix": "run-s fix:*",
       "fix:eslint": "yarn lint:eslint --fix",
       "fix:prettier": "yarn lint:prettier --write"
