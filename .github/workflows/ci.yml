@@ -9,9 +9,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
       - run: yarn --frozen-lockfile
-      - uses: actions/upload-artifact@v2
+      - uses: actions/cache@v1
         with:
-          name: install
+          key: install-${{ github.sha }}
           path: node_modules
 
   build:
@@ -22,16 +22,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
-      - uses: actions/download-artifact@v2
+      - uses: actions/cache@v1
         with:
-          name: install
+          key: install-${{ github.sha }}
+          path: node_modules
       - run: yarn build
-      - run: yarn pack
-      - run: mv *.tgz pnm.tgz
-      - uses: actions/upload-artifact@v2
+      - uses: actions/cache@v1
         with:
-          name: build
-          path: pnm.tgz
+          key: build-${{ github.sha }}
+          path: bin
 
   lint:
     name: Lint Files
@@ -41,9 +40,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
-      - uses: actions/download-artifact@v2
+      - uses: actions/cache@v1
         with:
-          name: install
+          key: install-${{ github.sha }}
+          path: node_modules
       - run: yarn lint
 
   publish:
@@ -53,6 +53,8 @@ jobs:
       - build
     steps:
       - uses: actions/setup-node@v1
-      - uses: actions/download-artifact@v2
-        name: build
-      - run: npm publish pnm.tgz --access public
+      - uses: actions/cache@v1
+        with:
+          key: build-${{ github.sha }}
+          path: bin
+      - run: npm publish --access public
