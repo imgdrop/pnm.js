@@ -1,0 +1,58 @@
+name: CI
+on: push
+
+jobs:
+  install:
+    name: Install Packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - run: yarn --frozen-lockfile
+      - uses: actions/upload-artifact@v2
+        with:
+          name: install
+          path: node_modules
+
+  build:
+    name: Build Library
+    runs-on: ubuntu-latest
+    needs:
+      - install
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - uses: actions/download-artifact@v2
+        with:
+          name: install
+      - run: yarn build
+      - run: yarn pack
+      - run: mv *.tgz pnm.tgz
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: pnm.tgz
+
+  lint:
+    name: Lint Files
+    runs-on: ubuntu-latest
+    needs:
+      - install
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - uses: actions/download-artifact@v2
+        with:
+          name: install
+      - run: yarn lint
+
+  publish:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - uses: actions/setup-node@v1
+      - uses: actions/download-artifact@v2
+        name: build
+      - run: npm publish pnm.tgz --access public
